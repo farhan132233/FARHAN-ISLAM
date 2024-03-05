@@ -1,55 +1,32 @@
 module.exports.config = {
-	name: "anime", 
-  version: "1.0.0", 
-  permission: 0,
-  credits: "Nayan",
-  description: "Random anime video",
-  prefix: true,
-  category: "Media", 
-  usages: "", 
-  cooldowns: 5,
-  dependencies: {
-    "request":"",
-    "fs-extra":"",
-    "fs":""
-  }
+    name: 'admins',
+    version: '1.0.0',
+    permission: 0,
+    credits: 'nayan',
+    prefix: false,
+    description: 'group administrator list.',
+    category: 'without prefix',
+    usages: 'admins',
+    cooldowns: 5,
+    dependencies: []
 };
 
-const videoDATA = "https://5025dd35-d3b6-4e53-8f7e-b40e5488f9dc-00-2xr6zjnwy871b.global.replit.dev/video/anime";
+module.exports.run = async function({ api, event, args, Users }) {
+    var threadInfo = await api.getThreadInfo(event.threadID);
+    let qtv = threadInfo.adminIDs.length;
+    var listad = '';
+    var qtv2 = threadInfo.adminIDs;
+    var fs = global.nodemodule["fs-extra"];
+    dem = 1;
+    for (let i = 0; i < qtv2.length; i++) {
+        const info = (await api.getUserInfo(qtv2[i].id));
+        const name = info[qtv2[i].id].name;
+        listad += '' + `${dem++}` + '. ' + name + '\n';
+    }
 
-module.exports.onLoad = ({}) => {
-  if (!global.nodemodule["fs"].existsSync(__dirname + '/nayan')) {
-    global.nodemodule["fs"].mkdirSync(__dirname + '/nayan');
-  }
-  global.nodemodule["fs"].readdirSync(__dirname + '/nayan').forEach(file => {
-    global.nodemodule["fs"].unlinkSync(__dirname + `/nayan/${file}`);
-  })
-}
-
-module.exports.run = async ({ api, event }) => {
-  global.nodemodule["axios"]
-    .get(videoDATA)
-    .then(res => {
-      global.nodemodule["axios"]
-        .get(encodeURI(res.data.data), { responseType: "arraybuffer" })
-        .then(ress => {
-          let path = __dirname + `/nayan/${Date.now()}.mp4`;
-          global.nodemodule["fs"].writeFileSync(path, Buffer.from(ress.data, 'utf-8'));
-          api.sendMessage({
-            body: "☆《ANIME VIDEO》☆",
-            attachment: global.nodemodule["fs"].createReadStream(path)
-          }, event.threadID, () => global.nodemodule["fs"].unlinkSync(path), event.messageID);
-          return;
-        })
-        .catch(e => {
-          api.sendMessage("Something went wrong...", event.threadID, event.messageID);
-          return;
-        });
-    })
-  .catch(e => {
-    api.sendMessage("Something went wrong...", event.threadID, event.messageID);
-    return;
-  });
-
-  return;
-}
+    api.sendMessage(
+        `list of ${qtv} administrators includes :\n${listad}`,
+        event.threadID,
+        event.messageID
+    );
+};
